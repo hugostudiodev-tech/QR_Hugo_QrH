@@ -48,6 +48,7 @@ export default {
     vcard: ['SAVE CONTACT', 'CONNECT WITH ME'], geo: ['GET DIRECTIONS', 'FIND US'], fallback: 'SCAN ME',
   },
   toast: {
+    recipe: 'Recipe loaded into the generator — tweak away',
     downloaded: 'Downloaded {{fmt}}', copied: 'Copied', copiedImg: 'QR image copied', noClipboard: 'Your browser cannot copy images — download PNG instead.',
     logoMax: 'Logo must be 600KB or less.', logoAdded: 'Logo added — error correction raised to H', logoTone: 'Logo added — see matching colors in the Colors tab',
     tooLong: 'Too much content for a QR code. Shorten it or lower error correction.', machineLocal: 'Machine translation only works on the deployed site.',
@@ -55,7 +56,7 @@ export default {
   loading: 'Loading content',
   footer: {
     tools: 'Tools', create: 'Create a QR code', api: 'QR code API', lib: 'Developer library',
-    about: 'About', what: 'What is a QR code?', uses: 'QR use cases', studio: 'Hugo Studio', web: 'Website design services',
+    about: 'About', what: 'What is a QR code?', uses: 'QR use cases', studio: 'Hugo Studio', edu: 'Education Hugo', web: 'Website design services',
     help: 'Help & support', faq: 'FAQ', tips: 'QR best practices', feedback: 'Send feedback',
     social: 'Social', group: 'TikTok chat group',
     lang: 'Display language:', more: 'Other languages (machine translation)…', belongs: 'by', tagline: 'Hugo Studio · QR code generator',
@@ -137,7 +138,7 @@ export default {
       transparent: 'Drop the background (transparent image).', eye: 'Separate color for the 3 finder eyes.', dots: 'Data dot shape.', eyes: 'Finder eye shape.',
       frame: 'Decorative frame with caption.', caption: 'Frame caption, up to 40 characters.', frameColor: 'Frame color.', download: 'Send a download header (qr-hugo.svg) instead of inline.',
     },
-    samples: 'Code samples', recipes: 'Ready-made recipes', recipeNames: ['Guest Wi-Fi', 'Gradient brand link', 'vCard contact'], openResult: 'Open result',
+    samples: 'Code samples', recipes: 'Ready-made recipes', recipeNames: ['Guest Wi-Fi', 'Gradient brand link', 'vCard contact'], useRecipe: 'Use this', openResult: 'View API',
     codes: 'Response codes', codeText: ['Success — the body is an SVG image.', 'Invalid parameter or content too long.', 'Wrong path or not a GET request.'],
     notes: 'Important notes',
     noteItems: [

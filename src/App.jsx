@@ -1,6 +1,6 @@
 import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULTS, DOTS, EYES, FRAMES, renderSvg } from '../lib/index.js';
+import { DEFAULTS, DOTS, EYES, FRAMES, renderSvg } from 'qr-hugo';
 import { contrast, dominantColor, LOGO_ICONS, makeLogo, suggestPalettes } from './smart.js';
 import { LANGS, MT_LANGS, machineTranslateUrl, setLang } from './i18n.js';
 
@@ -199,7 +199,7 @@ function Footer({ notify }) {
   const { t, i18n } = useTranslation();
   const cols = [
     ['tools', [['create', '#tao-qr'], ['api', '#api'], ['lib', '#thu-vien']]],
-    ['about', [['what', '#tim-hieu'], ['uses', '#ung-dung'], ['studio', 'https://www.hugowishpax.studio/'], ['web', 'https://www.hugowishpax.studio/']]],
+    ['about', [['what', '#tim-hieu'], ['uses', '#ung-dung'], ['studio', 'https://www.hugowishpax.studio/'], ['edu', 'https://education.hugowishpax.studio'], ['web', 'https://www.hugowishpax.studio/']]],
     ['help', [['faq', '#hoi-dap'], ['tips', '#meo'], ['feedback', 'mailto:contact@hugowishpax.studio']]],
   ];
   return (
@@ -286,6 +286,14 @@ export default function App() {
       notify(t(tone ? 'toast.logoTone' : 'toast.logoAdded'));
     };
     reader.readAsDataURL(file);
+  };
+  const applyRecipe = (nextType, nextFields, o) => {
+    setType(nextType);
+    setFields((all) => ({ ...all, [nextType]: nextFields }));
+    set(Object.fromEntries(['fg', 'fg2', 'gradient', 'bg', 'eye', 'dots', 'eyes', 'frame', 'caption', 'frameColor', 'transparent'].map((k) => [k, o[k]])));
+    setTab('content');
+    document.getElementById('tao-qr')?.scrollIntoView({ behavior: 'smooth' });
+    notify(t('toast.recipe'));
   };
   const toggleSound = () => {
     muted = sound;
@@ -521,7 +529,7 @@ export default function App() {
         </section>
 
         <LazySection id="tim-hieu"><Learn /></LazySection>
-        <LazySection id="api"><ApiDocs query={apiQuery} hasLogo={!!logo} notify={notify} /></LazySection>
+        <LazySection id="api"><ApiDocs query={apiQuery} hasLogo={!!logo} notify={notify} onApply={applyRecipe} /></LazySection>
       </main>
 
       <Footer notify={notify} />

@@ -1,4 +1,4 @@
-import { parseParams, renderSvg, DOTS, EYES, FRAMES, LEVELS } from '../lib/index.js';
+import { parseParams, renderSvg, DOTS, EYES, FRAMES, LEVELS } from 'qr-hugo';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

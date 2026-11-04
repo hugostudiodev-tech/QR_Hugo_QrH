@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { renderSvg, DEFAULTS } from '../lib/index.js';
+import { renderSvg, DEFAULTS } from 'qr-hugo';
 import { blip, Icon } from './App.jsx';
 
 const M = 4; // quiet zone used in the anatomy figure

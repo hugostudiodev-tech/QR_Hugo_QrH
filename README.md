@@ -17,7 +17,9 @@ Studio tạo mã QR mang phong cách riêng, chạy trên Cloudflare Workers + S
 
 Thêm ngôn ngữ dịch tay: tạo `src/locales/<code>.js` (copy `en.js`) rồi thêm một dòng vào `LANGS` và `loaders` trong `src/i18n.js`.
 
-Phát hành thư viện: `cd lib && npm publish`.
+Phát hành thư viện: `cd lib && npm publish`. Web và API import `qr-hugo` qua `"qr-hugo": "file:lib"`, nên sửa trong `lib/` là cả ba cùng đổi.
+
+Hosting: production chạy trên **Vercel** (`vercel.json`; API nằm ở `api/qr.js` và `api/index.js`, gọi lại đúng handler trong `worker/index.js`). Có thể deploy lên Cloudflare Workers bằng `npm run deploy`, vẫn dùng chung handler đó.
 
 ## Yêu cầu
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import worker from '../worker/index.js';
-import { parseParams, renderSvg, DOTS, EYES, FRAMES } from '../lib/index.js';
+import { parseParams, renderSvg, DOTS, EYES, FRAMES } from 'qr-hugo';
 
 const call = (q) => worker.fetch(new Request(`https://qr.example/api/qr?${q}`));
 

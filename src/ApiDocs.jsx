@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseParams, renderSvg } from '../lib/index.js';
+import { parseParams, renderSvg } from 'qr-hugo';
 import { blip, Icon } from './App.jsx';
 
 const PARAMS = [
@@ -10,9 +10,10 @@ const PARAMS = [
   ['frame', 'none | card | band | pill', 'none'], ['caption', 'string ≤ 40', 'SCAN ME'], ['frameColor', '#RRGGBB', '#0f0f15'], ['download', '1', '—'],
 ];
 const RECIPES = [
-  ['wifi', 'data=WIFI%3AT%3AWPA%3BS%3AHugo_Cafe%3BP%3A12345678%3B%3B&dots=rounded&eyes=soft&fg=%230a84ff&frame=card&frameColor=%230a84ff&caption=FREE%20WI-FI'],
-  ['link', 'url=https%3A%2F%2Fwww.hugowishpax.studio&dots=dots&eyes=circle&fg=%23ff375f&fg2=%23ff9f0a'],
-  ['contact_page', 'data=BEGIN%3AVCARD%0AVERSION%3A3.0%0AFN%3AHugo%0ATEL%3A%2B84912345678%0AEND%3AVCARD&dots=fluid&eyes=leaf&fg=%2330d158&fg2=%230a84ff&gradient=radial'],
+  // [icon, API query, builder content type, builder fields]
+  ['wifi', 'data=WIFI%3AT%3AWPA%3BS%3AHugo_Cafe%3BP%3A12345678%3B%3B&dots=rounded&eyes=soft&fg=%230a84ff&frame=card&frameColor=%230a84ff&caption=FREE%20WI-FI', 'wifi', { ssid: 'Hugo_Cafe', pass: '12345678', enc: 'WPA' }],
+  ['link', 'url=https%3A%2F%2Fwww.hugowishpax.studio&dots=dots&eyes=circle&fg=%23ff375f&fg2=%23ff9f0a', 'url', { url: 'https://www.hugowishpax.studio' }],
+  ['contact_page', 'data=BEGIN%3AVCARD%0AVERSION%3A3.0%0AFN%3AHugo%0ATEL%3A%2B84912345678%0AEND%3AVCARD&dots=fluid&eyes=leaf&fg=%2330d158&fg2=%230a84ff&gradient=radial', 'vcard', { name: 'Hugo', tel: '+84912345678' }],
 ];
 
 const apiSamples = (base) => ({
@@ -110,7 +111,7 @@ function CodeTabs({ samples, notify, label }) {
   );
 }
 
-export default function ApiDocs({ query, hasLogo, notify }) {
+export default function ApiDocs({ query, hasLogo, notify, onApply }) {
   const { t } = useTranslation();
   // Docs/code samples always show the public domain; live calls hit whichever server serves this page.
   const local = /^(localhost|127\.)/.test(location.hostname);
@@ -163,11 +164,17 @@ export default function ApiDocs({ query, hasLogo, notify }) {
 
       <h3 className="sub">{a('recipes')}</h3>
       <div className="recipes">
-        {RECIPES.map(([i, q], k) => (
-          <a key={i} className="recipe glass reveal" href={`${local ? '/api/qr' : base}?${q}`} target="_blank" rel="noreferrer">
-            <span className="recipe-img" aria-hidden="true" dangerouslySetInnerHTML={{ __html: thumbs[k] }} />
-            <span><Icon name={i} /> <b>{a('recipeNames')[k]}</b><small>{a('openResult')}</small></span>
-          </a>
+        {RECIPES.map(([i, q, type, fields], k) => (
+          <article key={i} className="recipe glass reveal">
+            <button type="button" className="recipe-img" aria-label={`${a('useRecipe')}: ${a('recipeNames')[k]}`} onClick={() => onApply(type, fields, parseParams(new URLSearchParams(q)))} dangerouslySetInnerHTML={{ __html: thumbs[k] }} />
+            <span>
+              <b><Icon name={i} /> {a('recipeNames')[k]}</b>
+              <span className="recipe-actions">
+                <button type="button" className="mini text" onClick={() => onApply(type, fields, parseParams(new URLSearchParams(q)))}><Icon name="auto_awesome" /> {a('useRecipe')}</button>
+                <a className="mini text ghosty" href={`${local ? '/api/qr' : base}?${q}`} target="_blank" rel="noreferrer"><Icon name="code" /> {a('openResult')}</a>
+              </span>
+            </span>
+          </article>
         ))}
       </div>
 

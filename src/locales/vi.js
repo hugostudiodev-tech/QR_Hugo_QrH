@@ -48,6 +48,7 @@ export default {
     vcard: ['LƯU DANH BẠ', 'KẾT NỐI VỚI TÔI'], geo: ['CHỈ ĐƯỜNG', 'TÌM CHÚNG TÔI'], fallback: 'QUÉT MÃ NÀY',
   },
   toast: {
+    recipe: 'Đã nạp mẫu vào trình tạo — sửa tiếp tùy ý',
     downloaded: 'Đã tải {{fmt}}', copied: 'Đã sao chép', copiedImg: 'Đã sao chép ảnh QR', noClipboard: 'Trình duyệt chưa hỗ trợ sao chép ảnh — hãy tải PNG.',
     logoMax: 'Logo tối đa 600KB.', logoAdded: 'Đã thêm logo — mức sửa lỗi tự nâng lên H', logoTone: 'Đã thêm logo — xem gợi ý màu khớp logo ở tab Màu sắc',
     tooLong: 'Nội dung quá dài cho mã QR. Hãy rút ngắn hoặc giảm mức sửa lỗi.', machineLocal: 'Dịch máy chỉ hoạt động trên trang đã deploy.',
@@ -55,7 +56,7 @@ export default {
   loading: 'Đang tải nội dung',
   footer: {
     tools: 'Công cụ', create: 'Tạo mã QR', api: 'API tạo QR', lib: 'Thư viện cho lập trình viên',
-    about: 'Giới thiệu', what: 'Mã QR là gì?', uses: 'Ứng dụng của QR', studio: 'Hugo Studio', web: 'Dịch vụ thiết kế website',
+    about: 'Giới thiệu', what: 'Mã QR là gì?', uses: 'Ứng dụng của QR', studio: 'Hugo Studio', edu: 'Education Hugo', web: 'Dịch vụ thiết kế website',
     help: 'Trợ giúp và hỗ trợ', faq: 'Hỏi & Đáp', tips: 'Mẹo dùng QR hiệu quả', feedback: 'Gửi góp ý',
     social: 'Mạng xã hội', group: 'Nhóm chat TikTok',
     lang: 'Ngôn ngữ hiển thị:', more: 'Ngôn ngữ khác (dịch máy)…', belongs: 'thuộc', tagline: 'Hugo Studio · công cụ tạo mã QR',
@@ -137,7 +138,7 @@ export default {
       transparent: 'Bỏ nền (ảnh trong suốt).', eye: 'Màu riêng cho 3 mắt định vị.', dots: 'Hình dạng chấm dữ liệu.', eyes: 'Hình dạng mắt định vị.',
       frame: 'Khung trang trí kèm dòng chữ.', caption: 'Chữ trên khung, tối đa 40 ký tự.', frameColor: 'Màu khung.', download: 'Trả header tải file (qr-hugo.svg) thay vì hiển thị.',
     },
-    samples: 'Ví dụ mã nguồn', recipes: 'Công thức có sẵn', recipeNames: ['Wi-Fi cho khách', 'Link thương hiệu gradient', 'Danh thiếp vCard'], openResult: 'Mở kết quả',
+    samples: 'Ví dụ mã nguồn', recipes: 'Công thức có sẵn', recipeNames: ['Wi-Fi cho khách', 'Link thương hiệu gradient', 'Danh thiếp vCard'], useRecipe: 'Dùng mẫu này', openResult: 'Xem API',
     codes: 'Mã phản hồi', codeText: ['Thành công — thân phản hồi là ảnh SVG.', 'Tham số sai hoặc nội dung quá dài.', 'Sai đường dẫn hoặc không phải GET.'],
     notes: 'Lưu ý quan trọng',
     noteItems: [
