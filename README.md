@@ -1,14 +1,23 @@
 # QR Hugo
 
-Trình tạo mã QR miễn phí, không quảng cáo, không tài khoản và không lưu dữ liệu. Dự án chạy độc lập trên Cloudflare Workers + Static Assets, không phụ thuộc Hugo Studio và không cần database.
+Studio tạo mã QR mang phong cách riêng, chạy trên Cloudflare Workers + Static Assets.
 
 ## Tính năng
 
-- Tạo QR từ link `http://` hoặc `https://` ngay trên trình duyệt.
-- Tùy chỉnh màu, nền, kích thước và mức sửa lỗi.
-- Tải PNG hoặc SVG.
-- API công khai trả về SVG.
-- Một Worker phục vụ cả website và API; không cần backend riêng.
+- 8 loại nội dung: link, văn bản, Wi-Fi, email, gọi điện, SMS, danh thiếp vCard, vị trí.
+- 7 kiểu chấm, 6 kiểu mắt, gradient chéo/tỏa tròn, màu mắt riêng, nền trong suốt, 6 mẫu có sẵn.
+- Logo: biểu tượng hoặc chữ viết tắt (đổi màu, 5 hình nền) hoặc ảnh tải lên; tự lấy màu chủ đạo của logo để gợi ý phối màu.
+- Đo độ tương phản (dễ quét / khó quét) và nút tự sửa.
+- Khung trang trí (thẻ, dải chữ, nút bo) kèm gợi ý chữ theo loại nội dung.
+- Tải PNG (tối đa 2048px) / SVG, sao chép ảnh.
+- i18next: tiếng Việt + English; các ngôn ngữ khác dùng dịch máy (Google Translate proxy, chỉ chạy trên domain đã deploy).
+- Lazy-load + skeleton cho các phần dưới, âm thanh WebAudio (có nút tắt), sáng/tối theo thiết bị.
+- SEO: sitemap.xml, robots.txt, hreflang, JSON-LD (WebApplication + FAQ).
+- API `GET /api/qr` (xem `GET /api`) và thư viện npm `qr-hugo` trong [lib/](lib/) (core, Web Component, React).
+
+Thêm ngôn ngữ dịch tay: tạo `src/locales/<code>.js` (copy `en.js`) rồi thêm một dòng vào `LANGS` và `loaders` trong `src/i18n.js`.
+
+Phát hành thư viện: `cd lib && npm publish`.
 
 ## Yêu cầu
 

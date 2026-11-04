@@ -1,0 +1,17 @@
+{
+  "name": "qr-hugo",
+  "version": "1.0.0",
+  "description": "Beautiful, customizable QR code generator (SVG) — dot & eye shapes, gradients, logos, frames. Core + Web Component + React.",
+  "type": "module",
+  "license": "MIT",
+  "main": "./index.js",
+  "exports": { ".": "./index.js", "./element": "./element.js", "./react": "./react.js" },
+  "files": ["index.js", "element.js", "react.js", "README.md"],
+  "sideEffects": ["./element.js"],
+  "keywords": ["qr", "qrcode", "qr-code", "qr-code-generator", "create-qr", "svg", "web-component", "react", "vue", "angular", "svelte"],
+  "homepage": "https://qr.hugowishpax.studio/#api",
+  "repository": { "type": "git", "url": "git+https://github.com/hugostudiodev-tech/QR_Hugo_QrH.git", "directory": "lib" },
+  "dependencies": { "qrcode-generator": "^1.4.4" },
+  "peerDependencies": { "react": ">=18" },
+  "peerDependenciesMeta": { "react": { "optional": true } }
+}

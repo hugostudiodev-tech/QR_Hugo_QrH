@@ -1,66 +1,54 @@
-import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { QRCodeSVG } from 'qrcode.react';
+import { parseParams, renderSvg, DOTS, EYES, FRAMES, LEVELS } from '../lib/index.js';
 
-const HEX = /^#[0-9a-f]{6}$/i;
-const LEVELS = new Set(['L', 'M', 'Q', 'H']);
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-export function qrOptions(searchParams) {
-  const raw = (searchParams.get('url') || '').trim();
-  if (!raw || raw.length > 2048) throw new Error('URL phải có từ 1 đến 2048 ký tự.');
-
-  let url;
-  try {
-    url = new URL(raw);
-  } catch {
-    throw new Error('URL không hợp lệ.');
-  }
-  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('URL chỉ hỗ trợ http hoặc https.');
-
-  const size = Math.min(1024, Math.max(128, Number.parseInt(searchParams.get('size'), 10) || 512));
-  const foreground = HEX.test(searchParams.get('foreground') || '') ? searchParams.get('foreground') : '#111827';
-  const background = HEX.test(searchParams.get('background') || '') ? searchParams.get('background') : '#ffffff';
-  const requestedLevel = (searchParams.get('level') || '').toUpperCase();
-  const level = LEVELS.has(requestedLevel) ? requestedLevel : 'M';
-  return { url: url.href, size, foreground, background, level };
-}
-
-export function renderQrSvg(options) {
-  return renderToStaticMarkup(React.createElement(QRCodeSVG, {
-    value: options.url,
-    size: options.size,
-    level: options.level,
-    fgColor: options.foreground,
-    bgColor: options.background,
-    marginSize: 2,
-    title: `Mã QR cho ${options.url}`,
-  }));
-}
+const SPEC = {
+  endpoint: 'GET /api/qr',
+  returns: 'image/svg+xml',
+  docs: 'https://qr.hugowishpax.studio/#api',
+  params: {
+    data: 'Nội dung bất kỳ (1–2048 ký tự). Bắt buộc nếu không có url.',
+    url: 'Link http/https (kiểm tra chặt). Dùng khi không có data.',
+    size: '128–2048, mặc định 512 (px)',
+    margin: '0–10 module, mặc định 2',
+    level: LEVELS.join(' | ') + ', mặc định M',
+    fg: '#RRGGBB màu chính, mặc định #0f0f15',
+    fg2: '#RRGGBB màu thứ hai → bật gradient',
+    gradient: 'linear | radial',
+    bg: '#RRGGBB màu nền, mặc định #ffffff',
+    transparent: '1 → nền trong suốt',
+    eye: '#RRGGBB màu riêng cho 3 mắt định vị',
+    dots: DOTS.join(' | '),
+    eyes: EYES.join(' | '),
+    frame: FRAMES.join(' | ') + ' — khung bao quanh mã',
+    caption: 'Chữ dưới khung (tối đa 40 ký tự), mặc định QUÉT MÃ NÀY',
+    frameColor: '#RRGGBB màu khung',
+    download: '1 → trình duyệt tải file thay vì hiển thị',
+  },
+};
 
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/')) {
-      return new Response(null, { status: 204, headers: CORS });
-    }
+    if (request.method === 'OPTIONS' && url.pathname.startsWith('/api')) return new Response(null, { status: 204, headers: CORS });
+    if (request.method === 'GET' && url.pathname === '/api') return Response.json(SPEC, { headers: CORS });
     if (request.method !== 'GET' || url.pathname !== '/api/qr') {
-      return Response.json({ error: 'Không tìm thấy API.' }, { status: 404, headers: CORS });
+      return Response.json({ error: 'Không tìm thấy API. Xem GET /api để biết cách dùng.' }, { status: 404, headers: CORS });
     }
-
     try {
-      const options = qrOptions(url.searchParams);
-      const headers = new Headers({
-        ...CORS,
-        'Content-Type': 'image/svg+xml; charset=utf-8',
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-        'Content-Disposition': url.searchParams.get('download') === '1' ? 'attachment; filename="qr-hugo.svg"' : 'inline',
+      const svg = renderSvg(parseParams(url.searchParams));
+      return new Response(svg, {
+        headers: {
+          ...CORS,
+          'Content-Type': 'image/svg+xml; charset=utf-8',
+          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+          'Content-Disposition': url.searchParams.get('download') === '1' ? 'attachment; filename="qr-hugo.svg"' : 'inline',
+        },
       });
-      return new Response(renderQrSvg(options), { headers });
     } catch (error) {
       return Response.json({ error: error.message }, { status: 400, headers: CORS });
     }

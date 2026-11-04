@@ -2,22 +2,51 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f5f7" />
-    <meta name="description" content="QR Hugo — tạo và tùy chỉnh mã QR miễn phí, không quảng cáo, không lưu dữ liệu." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f5f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0f15" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="QR Hugo — tạo mã QR mang dấu ấn riêng: link, Wi-Fi, danh thiếp, vị trí; tùy chỉnh màu, hình dạng, logo, khung; kèm API tạo QR và hướng dẫn chi tiết." />
     <meta name="robots" content="index, follow" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:site_name" content="QR Hugo" />
-    <meta property="og:title" content="QR Hugo — Tạo mã QR miễn phí" />
-    <meta property="og:description" content="Tạo, tùy chỉnh và tải mã QR miễn phí. Không tài khoản, không quảng cáo, không lưu dữ liệu." />
+    <meta property="og:title" content="QR Hugo — Studio thiết kế mã QR" />
+    <meta property="og:description" content="Tạo mã QR theo phong cách của bạn: màu, gradient, kiểu chấm, logo, khung chữ. Có API cho lập trình viên." />
     <meta property="og:url" content="https://qr.hugowishpax.studio/" />
+    <meta name="keywords" content="QR, QR code, tạo mã QR, tạo QR, create QR code, QR code generator, QR creator, make QR code, custom QR code, QR code with logo, QR Wi-Fi, QR vCard, QR API, 二维码生成器, QRコード作成, QR 코드 생성, generador de código QR, générateur de QR code, QR-Code-Generator" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="https://qr.hugowishpax.studio/" />
+    <link rel="alternate" hreflang="vi" href="https://qr.hugowishpax.studio/?lang=vi" />
+    <link rel="alternate" hreflang="en" href="https://qr.hugowishpax.studio/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://qr.hugowishpax.studio/" />
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@graph":[
+      {"@type":"WebApplication","name":"QR Hugo","alternateName":["QR Hugo — QR Code Generator","Tạo mã QR"],"url":"https://qr.hugowishpax.studio/","applicationCategory":"DesignApplication","operatingSystem":"Any","inLanguage":["vi","en"],"description":"Create custom QR codes: links, Wi-Fi, vCard, email, SMS, location. Colors, gradients, dot & eye shapes, logos, frames, PNG/SVG export and a REST API.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@type":"Organization","name":"Hugo Studio","url":"https://www.hugowishpax.studio/","sameAs":["https://www.tiktok.com/@hugo.studiotiktok","https://www.instagram.com/hugostudio.vn","https://www.facebook.com/share/1DdurLeBhW/"]}},
+      {"@type":"FAQPage","mainEntity":[
+        {"@type":"Question","name":"What is a QR code?","acceptedAnswer":{"@type":"Answer","text":"QR (Quick Response) is a two-dimensional barcode invented by Denso Wave in 1994. It stores data in a grid of squares that phone cameras can read from any direction."}},
+        {"@type":"Question","name":"Do QR codes expire?","acceptedAnswer":{"@type":"Answer","text":"Static QR codes never expire: the content is inside the image. A code only stops working if the link inside stops working."}},
+        {"@type":"Question","name":"Why does a QR code with a logo need error correction level H?","acceptedAnswer":{"@type":"Answer","text":"A logo covers the center. Level H recovers up to 30% of lost data so the code still scans."}},
+        {"@type":"Question","name":"Mã QR là gì?","acceptedAnswer":{"@type":"Answer","text":"QR (Quick Response) là mã vạch hai chiều do Denso Wave phát minh năm 1994, lưu dữ liệu trong lưới ô vuông và đọc được bằng camera điện thoại."}}
+      ]}
+    ]}
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>QR Hugo — Tạo mã QR miễn phí</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0..1,0&icon_names=arrow_downward,auto_awesome,badge,bolt,brush,call,campaign,center_focus_strong,close,cloud_off,code,confirmation_number,contact_page,content_copy,contrast,crop_free,devices,download,eco,edit_note,error,expand_more,filter_center_focus,grid_view,home_work,image,info,interests,inventory_2,link,location_on,mail,more_horiz,notes,open_in_new,palette,phone_iphone,print,qr_code_2,restaurant,school,science,shield,short_text,sms,storefront,straighten,translate,upload,verified,volume_off,volume_up,water_drop,wifi&display=block" />
+    <title>QR Hugo — Studio thiết kế mã QR</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Crawler/no-JS fallback; React replaces it on load. -->
+      <main style="max-width:720px;margin:40px auto;padding:0 16px;font-family:system-ui,sans-serif">
+        <h1>QR Hugo — Tạo mã QR / QR Code Generator</h1>
+        <p>Tạo mã QR đẹp cho link, Wi-Fi, danh thiếp vCard, email, SMS và vị trí. Tùy chỉnh màu, gradient, kiểu chấm, logo, khung chữ; tải PNG/SVG; API tạo QR và thư viện cho React, Vue, Angular, Svelte.</p>
+        <p>Create custom QR codes for links, Wi-Fi, vCard contacts, email, SMS and locations — colors, gradients, dot shapes, logos and frames, PNG/SVG export, a QR code API and a library for every framework.</p>
+        <noscript><p>Bật JavaScript để dùng trình tạo QR. · Enable JavaScript to use the QR generator.</p></noscript>
+      </main>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
