@@ -1,6 +1,6 @@
 {
   "name": "qr-hugo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Beautiful, customizable QR code generator (SVG) — dot & eye shapes, gradients, logos, frames. Core + Web Component + React.",
   "type": "module",
   "license": "MIT",

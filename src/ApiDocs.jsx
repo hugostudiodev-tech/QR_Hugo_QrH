@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseParams, renderSvg } from 'qr-hugo';
+import { parseParams, renderSvg, DOTS, EYE_OUTER, EYE_INNER, FRAMES } from 'qr-hugo';
 import { blip, Icon } from './App.jsx';
 
 const PARAMS = [
   ['data', 'string', '—'], ['url', 'string', '—'], ['size', 'number', '512'], ['margin', 'number', '2'], ['level', 'L | M | Q | H', 'M'],
   ['fg', '#RRGGBB', '#0f0f15'], ['fg2', '#RRGGBB', '—'], ['gradient', 'linear | radial', 'linear'], ['bg', '#RRGGBB', '#ffffff'], ['transparent', '1', '—'],
-  ['eye', '#RRGGBB', '= fg'], ['dots', 'square | rounded | fluid | dots | diamond | star | bars', 'square'], ['eyes', 'square | rounded | circle | leaf | dot | soft', 'square'],
-  ['frame', 'none | card | band | pill', 'none'], ['caption', 'string ≤ 40', 'SCAN ME'], ['frameColor', '#RRGGBB', '#0f0f15'], ['download', '1', '—'],
+  ['eye', '#RRGGBB', '= fg'], ['dots', DOTS.join(' | '), 'square'], ['eyes', 'square | rounded | circle | leaf | dot | soft', 'square'],
+  ['eyeOuter', EYE_OUTER.join(' | '), '= eyes'], ['eyeInner', EYE_INNER.join(' | '), '= eyes'], ['eye2', '#RRGGBB', '= eye'],
+  ['frame', FRAMES.join(' | '), 'none'], ['caption', 'string ≤ 40', 'SCAN ME'], ['frameColor', '#RRGGBB', '#0f0f15'], ['download', '1', '—'],
 ];
 const RECIPES = [
   // [icon, API query, builder content type, builder fields]
@@ -17,30 +18,30 @@ const RECIPES = [
 ];
 
 const apiSamples = (base) => ({
-  HTML: `<img
-  src="${base}?data=https%3A%2F%2Fexample.com&dots=rounded"
-  width="256" height="256"
-  alt="QR code"
-  loading="lazy"
-/>`,
-  JavaScript: `const params = new URLSearchParams({
+  'Node.js': `// Chạy ở máy chủ — đừng để lộ key trên trình duyệt
+const params = new URLSearchParams({
   data: 'https://example.com/product?id=42',
   size: '512',
   dots: 'rounded',
   fg: '#0a84ff',            // URLSearchParams encodes # → %23
 });
 
-const res = await fetch(\`${base}?\${params}\`);
-if (!res.ok) throw new Error((await res.json()).error);
-document.querySelector('#qr').innerHTML = await res.text();`,
+const res = await fetch(\`${base}?\${params}\`, {
+  headers: { Authorization: \`Bearer \${process.env.QR_HUGO_KEY}\` },
+});
+if (!res.ok) throw new Error((await res.json()).error); // 401 key, 429 rate limit
+const svg = await res.text();`,
   cURL: `curl -G "${base}" \\
+  -H "Authorization: Bearer $QR_HUGO_KEY" \\
   --data-urlencode "data=https://example.com" \\
   --data-urlencode "fg=#0a84ff" \\
   -d size=1024 -d dots=dots -d eyes=circle \\
   -o qr.svg`,
-  Python: `import requests
+  Python: `import os, requests
 
-res = requests.get("${base}", params={
+res = requests.get("${base}", headers={
+    "Authorization": f"Bearer {os.environ['QR_HUGO_KEY']}",
+}, params={
     "data": "https://example.com",
     "size": 1024,
     "dots": "rounded",
@@ -55,7 +56,10 @@ $query = http_build_query([
   'dots' => 'fluid',
   'fg'   => '#0a84ff',
 ]);
-file_put_contents('qr.svg', file_get_contents("${base}?$query"));`,
+$ctx = stream_context_create(['http' => [
+  'header' => 'Authorization: Bearer ' . getenv('QR_HUGO_KEY'),
+]]);
+file_put_contents('qr.svg', file_get_contents("${base}?$query", false, $ctx));`,
 });
 
 const LIB = {
@@ -117,19 +121,14 @@ export default function ApiDocs({ query, hasLogo, notify, onApply }) {
   const local = /^(localhost|127\.)/.test(location.hostname);
   const base = `${local ? 'https://qr.hugowishpax.studio' : location.origin}/api/qr`;
   const api = `${base}?${query}`;
-  const live = `/api/qr?${query}`;
+  // preview renders locally: the real endpoint needs a Bearer key, which never belongs in browser code.
+  const preview = useMemo(() => { try { return renderSvg({ ...parseParams(new URLSearchParams(query)), size: 200 }, 'pg'); } catch { return ''; } }, [query]);
+  const curl = `curl -H "Authorization: Bearer $QR_HUGO_KEY" "${api}" -o qr.svg`;
   const thumbs = useMemo(() => RECIPES.map(([, q], k) => renderSvg({ ...parseParams(new URLSearchParams(q)), size: 80 }, `r${k}`)), []);
-  const [imgState, setImgState] = useState('loading');
   const a = (k) => t(`api.${k}`);
 
   return (
-    <section className="section api" aria-labelledby="api-title">
-      <div className="section-head">
-        <p className="kicker">{a('kicker')}</p>
-        <h2 id="api-title">{a('title')}</h2>
-        <p className="lead">{a('lead')}</p>
-      </div>
-
+    <div className="api-docs">
       <ol className="steps">
         {a('steps').map(([h, p], i) => <li key={h} className="glass reveal"><span>{i + 1}</span><h3>{h}</h3><p>{p}</p></li>)}
       </ol>
@@ -142,13 +141,9 @@ export default function ApiDocs({ query, hasLogo, notify, onApply }) {
         <div className="endpoint">
           <span className="method">GET</span>
           <code>{api}</code>
-          <Copy text={api} notify={notify} />
-          <a className="mini text" href={api} target="_blank" rel="noreferrer"><Icon name="open_in_new" /> {a('open')}</a>
+          <Copy text={curl} notify={notify} />
         </div>
-        <div className="playground-preview">
-          {imgState !== 'ok' && <div className={`sk sk-qr${imgState === 'error' ? ' err' : ''}`}>{imgState === 'error' && <span><Icon name="cloud_off" /> {a('offline')}</span>}</div>}
-          <img key={live} src={live} alt={a('result')} loading="lazy" width="200" height="200" hidden={imgState !== 'ok'} onLoad={() => setImgState('ok')} onError={() => setImgState('error')} />
-        </div>
+        <div className="playground-preview" role="img" aria-label={a('result')} dangerouslySetInnerHTML={{ __html: preview }} />
       </div>
 
       <h3 className="sub">{a('params')}</h3>
@@ -171,7 +166,7 @@ export default function ApiDocs({ query, hasLogo, notify, onApply }) {
               <b><Icon name={i} /> {a('recipeNames')[k]}</b>
               <span className="recipe-actions">
                 <button type="button" className="mini text" onClick={() => onApply(type, fields, parseParams(new URLSearchParams(q)))}><Icon name="auto_awesome" /> {a('useRecipe')}</button>
-                <a className="mini text ghosty" href={`${local ? '/api/qr' : base}?${q}`} target="_blank" rel="noreferrer"><Icon name="code" /> {a('openResult')}</a>
+                <Copy text={`curl -H "Authorization: Bearer $QR_HUGO_KEY" "${base}?${q}" -o qr.svg`} notify={notify} />
               </span>
             </span>
           </article>
@@ -181,7 +176,7 @@ export default function ApiDocs({ query, hasLogo, notify, onApply }) {
       <div className="api-notes">
         <div className="glass">
           <h3>{a('codes')}</h3>
-          <ul>{['200', '400', '404'].map((c, i) => <li key={c}><code className={`status s${c[0]}`}>{c}</code><span><b>{i ? 'application/json' : 'image/svg+xml'}</b> {a('codeText')[i]}</span></li>)}</ul>
+          <ul>{['200', '400', '401', '429', '404'].map((c, i) => <li key={c}><code className={`status s${c[0]}`}>{c}</code><span><b>{i ? 'application/json' : 'image/svg+xml'}</b> {a('codeText')[i]}</span></li>)}</ul>
         </div>
         <div className="glass">
           <h3>{a('notes')}</h3>
@@ -194,6 +189,6 @@ export default function ApiDocs({ query, hasLogo, notify, onApply }) {
         <p className="lead" style={{ marginTop: 0, marginBottom: 20 }}>{t('api.lib.text')}</p>
         <CodeTabs samples={LIB} notify={notify} label={t('api.lib.title')} />
       </div>
-    </section>
+    </div>
   );
 }

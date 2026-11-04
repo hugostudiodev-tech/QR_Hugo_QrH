@@ -1,6 +1,6 @@
 import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DEFAULTS, DOTS, EYES, FRAMES, renderSvg } from 'qr-hugo';
+import { DEFAULTS, DOTS, EYES, EYE_OUTER, EYE_INNER, FRAMES, renderSvg } from 'qr-hugo';
 import { contrast, dominantColor, LOGO_ICONS, makeLogo, suggestPalettes } from './smart.js';
 import { LANGS, MT_LANGS, machineTranslateUrl, setLang } from './i18n.js';
 
@@ -13,7 +13,7 @@ const lazyChunk = (load) => lazy(() => load().then((m) => { try { sessionStorage
   return new Promise(() => {});
 }));
 const Learn = lazyChunk(() => import('./Learn.jsx'));
-const ApiDocs = lazyChunk(() => import('./ApiDocs.jsx'));
+const ApiGate = lazyChunk(() => import('./ApiGate.jsx'));
 
 /* ---------- sound: tiny WebAudio blips, no audio files ---------- */
 let audio;
@@ -67,7 +67,7 @@ const TYPES = {
   geo: { icon: 'location_on', fields: [['lat', 'lat', '10.7769', 'number'], ['lng', 'lng', '106.7009', 'number']], build: (f) => (f.lat && f.lng ? `geo:${f.lat},${f.lng}` : '') },
 };
 
-const BASE = { fg: '#0f0f15', fg2: '', gradient: 'linear', bg: '#ffffff', eye: '', dots: 'square', eyes: 'square' };
+const BASE = { fg: '#0f0f15', fg2: '', gradient: 'linear', bg: '#ffffff', eye: '', eye2: '', dots: 'square', eyes: 'square', eyeOuter: '', eyeInner: '' };
 const PRESETS = [
   {},
   { fg: '#0a84ff', fg2: '#5e5ce6', dots: 'rounded', eyes: 'rounded' },
@@ -253,6 +253,8 @@ export default function App() {
     try { return { svg: renderSvg({ ...style, caption: style.caption || captions[0], logo, data }, 'main') }; } catch { return { error: t('toast.tooLong') }; }
   }, [data, style, logo, captions, t]);
   const thumb = (patch, id) => renderSvg({ ...DEFAULTS, ...style, size: 64, margin: 1, logo: '', frame: 'none', ...patch, data: 'HUGO' }, id);
+  // zoom into the top-left finder so eye shapes are readable at thumbnail size
+  const eyeThumb = (patch, id) => thumb(patch, id).replace(/viewBox="[^"]*"/, 'viewBox="0.5 0.5 8 8"');
   const ratio = contrast(style.fg, style.transparent ? '#ffffff' : style.bg);
   const palettes = useMemo(() => suggestPalettes(logoTone || (lg.kind === 'icon' || lg.kind === 'text' ? lg.bg : style.fg)), [logoTone, lg, style.fg]);
   const urlWarn = type === 'url' && data && !/^https?:\/\/\S+\.\S+/i.test(data);
@@ -290,7 +292,7 @@ export default function App() {
   const applyRecipe = (nextType, nextFields, o) => {
     setType(nextType);
     setFields((all) => ({ ...all, [nextType]: nextFields }));
-    set(Object.fromEntries(['fg', 'fg2', 'gradient', 'bg', 'eye', 'dots', 'eyes', 'frame', 'caption', 'frameColor', 'transparent'].map((k) => [k, o[k]])));
+    set(Object.fromEntries(['fg', 'fg2', 'gradient', 'bg', 'eye', 'eye2', 'dots', 'eyes', 'eyeOuter', 'eyeInner', 'frame', 'caption', 'frameColor', 'transparent'].map((k) => [k, o[k]])));
     setTab('content');
     document.getElementById('tao-qr')?.scrollIntoView({ behavior: 'smooth' });
     notify(t('toast.recipe'));
@@ -304,7 +306,7 @@ export default function App() {
 
   const apiQuery = useMemo(() => {
     const q = new URLSearchParams({ data: data || DEFAULTS.data });
-    for (const k of ['size', 'margin', 'level', 'fg', 'fg2', 'gradient', 'bg', 'eye', 'dots', 'eyes']) {
+    for (const k of ['size', 'margin', 'level', 'fg', 'fg2', 'gradient', 'bg', 'eye', 'eye2', 'dots', 'eyes', 'eyeOuter', 'eyeInner']) {
       const v = style[k];
       if (v && v !== { ...DEFAULTS, size: 512 }[k] && !(k === 'gradient' && !style.fg2)) q.set(k, v);
     }
@@ -399,9 +401,13 @@ export default function App() {
                       ))}
                     </div>
                     <p className="label">{b('dots')}</p>
-                    <Choice list={DOTS} names={b('dotNames')} value={style.dots} onPick={(dots) => { set({ dots }); blip(700); }} render={(dots) => thumb({ dots }, `d${dots}`)} />
+                    <Choice list={DOTS} names={b('dotNames')} value={style.dots} onPick={(dots) => { set({ dots }); blip(700); }} render={(dots) => thumb({ dots }, `d${dots}`).replace(/viewBox="[^"]*"/, 'viewBox="7 7 10 10"')} />
                     <p className="label">{b('eyes')}</p>
-                    <Choice list={EYES} names={b('eyeNames')} value={style.eyes} onPick={(eyes) => { set({ eyes }); blip(760); }} render={(eyes) => thumb({ eyes }, `e${eyes}`)} />
+                    <Choice list={EYES} names={b('eyeNames')} value={!style.eyeOuter && !style.eyeInner ? style.eyes : ''} onPick={(eyes) => { set({ eyes, eyeOuter: '', eyeInner: '' }); blip(760); }} render={(eyes) => thumb({ eyes, eyeOuter: '', eyeInner: '' }, `e${eyes}`)} />
+                    <p className="label">{b('eyeOuter')}</p>
+                    <Choice list={EYE_OUTER} names={b('outerNames')} value={style.eyeOuter} onPick={(eyeOuter) => { set({ eyeOuter }); blip(780); }} render={(eyeOuter) => eyeThumb({ eyeOuter }, `o${eyeOuter}`)} />
+                    <p className="label">{b('eyeInner')}</p>
+                    <Choice list={EYE_INNER} names={b('innerNames')} value={style.eyeInner} onPick={(eyeInner) => { set({ eyeInner }); blip(800); }} render={(eyeInner) => eyeThumb({ eyeInner }, `i${eyeInner}`)} />
                   </>
                 )}
 
@@ -411,6 +417,7 @@ export default function App() {
                       <ColorField label={b('fg')} value={style.fg} onChange={(fg) => set({ fg })} />
                       <ColorField label={b('fg2')} value={style.fg2} onChange={(fg2) => set({ fg2 })} optional />
                       <ColorField label={b('eye')} value={style.eye} onChange={(eye) => set({ eye })} optional />
+                      <ColorField label={b('eye2')} value={style.eye2} onChange={(eye2) => set({ eye2 })} optional />
                       <ColorField label={b('bg')} value={style.bg} onChange={(bg) => set({ bg, transparent: false })} />
                     </div>
                     {style.fg2 && (
@@ -529,7 +536,7 @@ export default function App() {
         </section>
 
         <LazySection id="tim-hieu"><Learn /></LazySection>
-        <LazySection id="api"><ApiDocs query={apiQuery} hasLogo={!!logo} notify={notify} onApply={applyRecipe} /></LazySection>
+        <LazySection id="api"><ApiGate query={apiQuery} hasLogo={!!logo} notify={notify} onApply={applyRecipe} /></LazySection>
       </main>
 
       <Footer notify={notify} />

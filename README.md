@@ -21,6 +21,8 @@ Phát hành thư viện: `cd lib && npm publish`. Web và API import `qr-hugo` q
 
 Hosting: production chạy trên **Vercel** (`vercel.json`; API nằm ở `api/qr.js` và `api/index.js`, gọi lại đúng handler trong `worker/index.js`). Có thể deploy lên Cloudflare Workers bằng `npm run deploy`, vẫn dùng chung handler đó.
 
+API key: mọi endpoint `/api*` đòi `Authorization: Bearer HS-<mã thành viên>-<bí mật>`. Key do app **QR Hugo** trong Hugo Studio cấp; máy chủ này hỏi Hugo Studio (`/api/qr-key/connect`, `/use`, `/log`) bằng biến môi trường `QR_SERVICE_SECRET` (đặt giống hệt bên Hugo Studio). Tùy chọn `HUGO_STUDIO_API` (mặc định `https://www.hugowishpax.studio/api`).
+
 ## Yêu cầu
 
 - Node.js 20.19 trở lên.
